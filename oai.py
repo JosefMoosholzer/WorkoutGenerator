@@ -1,7 +1,8 @@
 import openai
+import streamlit as st
 
 # Set up OpenAI API key
-openai.api_key = "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"
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Define a function that generates a list of exercises based on user inputs
 def generate_exercises(muscle_area, exercise_type, intensity, amount):

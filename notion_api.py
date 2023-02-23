@@ -2,6 +2,7 @@ from typing import List, Dict, Callable
 import requests
 import re as regex
 from random import sample
+import streamlit as st
 
 from exercise import *
 from muscle_area import MuscleArea
@@ -72,7 +73,7 @@ def extract_weight_function(rep_prompt: str, weight_prompt: str) -> Callable[[in
 
 
 def create_header():
-    api_key: str = "secret_Cx84Em1iMUYljlU2IBiMbJe29P3EjR7lizYPKx14ssW"
+    api_key: st.secrets["NOTION_API_KEY"]
 
     return {'Authorization': f"Bearer {api_key}", 
             'Content-Type': 'application/json', 
