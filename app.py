@@ -1,11 +1,16 @@
 import streamlit as st
 import oai
-from notion_api import get_exercises
-from workout import Workout
+import re as regex
+from notion_api import get_exercises, sample_exercises
+from workout import Workout, str_to_exercise_types
+from muscle_area import MuscleArea, str_to_muscle_areas
 
-em_dash = "—"
-notion_exercises = ""
-oai_exercises = ""
+# Global variables
+oai_exercises: list = []
+notion_url: str = "https://dapper-lobe-3ac.notion.site/Workouts-e46955bc195a484087a9c3e7e9f57418"
+notion_exercises: list = []
+sampled_exercises: list = []
+workout: Workout = None
 
 # Define the options for each user input
 muscle_areas = ["Full Upper Body", "Upper Body - Push", "Upper Body - Pull", "Full Core", "Core - Abs", "Core - Lower Back", "Legs"]
@@ -21,9 +26,9 @@ col1, col2 = st.columns([2,3])
 # Add inputs to the left column
 with col1:
     muscle_area = st.selectbox("Muscle area", muscle_areas)
-    exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises"])
+    exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Both"])
     intensity = st.slider("Intensity level", 1, 10, 2)
-    num_exercises = st.slider("Number of exercises", 4, 8, 6)
+    num_exercises = st.slider("Number of exercises", 1, 6, 4)
     _, subcol1, _, subcol2, _= st.columns(5)
     with subcol1:
         oai_button = st.button("OpenAI", key="oai_button")
@@ -35,13 +40,15 @@ with col2:
     if oai_button:
         oai_exercises = oai.generate_exercises(muscle_area, exercise_type, intensity, num_exercises)
         if oai_exercises:
-            st.write(f"Here are some {exercise_type} exercises targeting the {muscle_area} area at an intensity level of {intensity}:")
+            st.markdown(f"Here are some {exercise_type.lower()} exercises provided by **OpenAI** targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
             for exercise in oai_exercises[1:]:
                 st.write(f"- {exercise}")
         else:
             st.write("OpenAI seems to be too busy, try the other option! :smile:")
     if notion_button:
-        if not notion_exercises:
-            notion_exercises = get_exercises()
-        
-
+        notion_exercises = get_exercises()
+        sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
+        workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
+        st.markdown(f"Here are some {exercise_type.lower()} exercises taken from my **Notion-notebook** ([see here]({notion_url})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
+        for exercise in workout.list_exercises():
+            st.write(f"- {exercise}")

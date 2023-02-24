@@ -8,36 +8,43 @@ from exercise import *
 from muscle_area import MuscleArea
 
 
-def str_to_exercise(prompt: str) -> Exercise:
+def str_to_exercise(prompt: str, muscle_area: MuscleArea) -> Exercise:
     """ Creates an (Weighted)Exercise object out of the give string prompt. """
     inputs = prompt.split(",")
-    if len(inputs) == 2:
-        return str_to_body_exercise(inputs)
-    elif len(inputs) == 4:
-        return str_to_weighted_exercise(inputs)
-    else:
-        raise ValueError(f"Workout {inputs[0]} does not give either 2 or 4 inputs. Check Notion!")
+    try: 
+        if "bw" in inputs[-1]:
+            return str_to_body_exercise(inputs, muscle_area)
+        else:
+            return str_to_weighted_exercise(inputs, muscle_area)
+    except:
+        raise ValueError(f"Workout {inputs[0]} is not correctly listed. Check Notion!")
 
 
-def str_to_body_exercise(inputs: List[str]) -> BodyExercise:
+def str_to_body_exercise(inputs: List[str], muscle_area: MuscleArea) -> BodyExercise:
     """ Creates an Exercise object from a list of two strings.\n
     The second element will be converted into a function that provides a dynamic number of reps for a given 'factor'. """
 
-    return Exercise(
+    return BodyExercise(
             inputs[0],
-            extract_reps_function(inputs[1]))
+            inputs[3],
+            muscle_area,
+            extract_reps_function(inputs[1]),
+            extract_weight_function(inputs[1], inputs[2])
+            )
 
 
-def str_to_weighted_exercise(inputs: List[str]) -> WeightedExercise:
+def str_to_weighted_exercise(inputs: List[str], muscle_area: MuscleArea) -> WeightedExercise:
     """ Creates an Exercise object from a list of four strings.\n
     The second element will be converted into a function that provides a dynamic number of reps for a given 'factor'.\n
     The third elements will be converted into a function that provides a dynamic amount of weight for a given 'factor' """
 
     return WeightedExercise(
             inputs[0],
+            inputs[3],
+            muscle_area,
             extract_reps_function(inputs[1]),
-            extract_weight_function(inputs[1], inputs[2]),
-            inputs[3])
+            extract_weight_function(inputs[1], inputs[2])
+            )
 
 
 def extract_reps_function(rep_prompt: str) -> Callable[[int], str]:
@@ -61,6 +68,8 @@ def reps_from_to(num_from: int, num_to: int) -> Callable[[int], str]:
 
 
 def extract_weight_function(rep_prompt: str, weight_prompt: str) -> Callable[[int], float]:
+    if "none" in weight_prompt:
+        return lambda x: 0
     base: float = float(regex.sub("[^0-9.]", "", weight_prompt.split("+")[0]))
     increment: float = float(regex.sub("[^0-9.]", "", weight_prompt.split("+")[1]))
     if "to" in rep_prompt:
@@ -73,7 +82,7 @@ def extract_weight_function(rep_prompt: str, weight_prompt: str) -> Callable[[in
 
 
 def create_header():
-    api_key: st.secrets["NOTION_API_KEY"]
+    api_key: str = st.secrets["NOTION_API_KEY"]
 
     return {'Authorization': f"Bearer {api_key}", 
             'Content-Type': 'application/json', 
@@ -81,19 +90,20 @@ def create_header():
 
 
 def api_get(id) -> dict:
+    print("API-Request")
     return requests.get(f"https://api.notion.com/v1/blocks/{id}/children", headers=create_header()).json()["results"]
 
 
 def get_exercises() -> List[Exercise]:
     page_id: str = "e46955bc-195a-4840-87a9-c3e7e9f57418"
-    bullets = [(result["bulleted_list_item"]["rich_text"][0]["plain_text"].lower(), result["id"]) for result in api_get(page_id)]
+    bullets = [(result["bulleted_list_item"]["rich_text"][0]["plain_text"], result["id"]) for result in api_get(page_id)]
     
-    return [str_to_exercise(exercise["bulleted_list_item"]["rich_text"][0]["plain_text"]) for bullet in bullets for exercise in api_get(bullet[1])]
+    return [str_to_exercise(exercise["bulleted_list_item"]["rich_text"][0]["plain_text"], MuscleArea(bullet[0])) for bullet in bullets for exercise in api_get(bullet[1])]
 
 
-def sample_exercises(exercises: List[Exercise], muscle_area: MuscleArea, exercise_type, amount: int):
-    sub_pop = [exercise for exercise in exercises if (exercise.muscle_area == muscle_area and type(exercise) == exercise_type)]
+def sample_exercises(exercises: List[Exercise], muscle_areas: MuscleArea, exercise_types, amount: int):
+    sub_pop = [exercise for exercise in exercises if (exercise.muscle_area in muscle_areas and type(exercise) in exercise_types)]
     try: # in case the sub-population is too small
         return sample(sub_pop, amount)
     except ValueError:
-        return sample_exercises(exercises, muscle_area, exercise_type, amount - 1)
+        return sample_exercises(exercises, muscle_areas, exercise_types, amount - 1)

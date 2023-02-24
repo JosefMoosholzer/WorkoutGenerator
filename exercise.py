@@ -18,7 +18,7 @@ class WeightedExercise(Exercise):
         self.weights = weights
 
     def to_str(self, factor: int) -> str:
-        return self.name + ":\n\t" + str(self.sets) + "sets of " + self.reps_range(factor) + " w/ " + str(self.weights(factor)) + "kg"
+        return self.name + ":\n\t" + str(self.sets) + " sets of " + self.reps_range(factor) + " w/ " + str(self.weights(factor)) + "kg"
 
     
 class BodyExercise(Exercise):
@@ -35,7 +35,4 @@ class BodyExercise(Exercise):
             return "."
 
     def to_str(self, factor: float) -> str:
-        return self.name + ":\n\t" + str(self.sets) + "sets of " + self.reps(factor) + self.calculate_extra_weight(factor)
-
-body_exercise = BodyExercise("Push Ups", 3, MuscleArea("Upper Push"), lambda x: f"{15 + 2*x}", lambda x: (x-5)*2 if x > 5 else 0)
-print(body_exercise.to_str(2))
+        return self.name + ":\n\t" + str(self.sets) + " sets of " + self.reps(factor) + self.calculate_extra_weight(factor)
