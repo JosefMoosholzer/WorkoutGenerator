@@ -25,7 +25,7 @@ with col1:
     exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Both"])
     intensity = st.slider("Intensity level", 0, 10, 2)
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
-    email = st.text_input("Optional - Enter your email address:\nSo you can retrieve your generated workout later!", "example@gmail.com")
+    email = st.text_input("(Optional) Enter your email address - to retrieve your workout later!")
 
     _, subcol1, _, subcol2, _= st.columns(5)
     with subcol1:
@@ -43,7 +43,7 @@ with col2:
                 st.write(f"- {exercise}")
             if email:
                 send_message_to(oai_exercises, email)
-                st.write("You should have received an E-Mail with the subject: 'Your generated workout'")
+                st.write("You should have received an E-Mail with the subject 'Your generated workout'!")
         else:
             st.write("OpenAI seems to be too busy, try the other option! :smile:")
     if notion_button:
@@ -56,6 +56,6 @@ with col2:
                 st.write(f"- {exercise}")
             if email:
                 send_message_to(workout.to_str(), email)
-                st.write("You should have received an E-Mail with the subject: 'Your generated workout'")
+                st.write("You should have received an E-Mail with the subject 'Your generated workout'!")
         else:
             st.write("The Notion-API does not to seem work :disappointed:")
