@@ -42,7 +42,7 @@ with col2:
             for exercise in oai_exercises[1:]:
                 st.write(f"- {exercise}")
             if email:
-                send_message_to(oai_exercises, email)
+                send_message_to("\n".join(oai_exercises), email)
                 st.write("You should have received an E-Mail with the subject 'Your generated workout'!")
         else:
             st.write("OpenAI seems to be too busy, try the other option! :smile:")
