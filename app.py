@@ -25,8 +25,7 @@ with col1:
     exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Both"])
     intensity = st.slider("Intensity level", 0, 10, 2)
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
-    email = st.text_input("Enter your email address: - Optional")
-    st.write("This way you can retrieve your generated workout later!")
+    email = st.text_input("Optional - Enter your email address:\nSo you can retrieve your generated workout later!")
 
     _, subcol1, _, subcol2, _= st.columns(5)
     with subcol1:
