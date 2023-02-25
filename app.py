@@ -4,22 +4,18 @@ import re as regex
 from notion_api import get_exercises, sample_exercises
 from workout import Workout, str_to_exercise_types
 from muscle_area import MuscleArea, str_to_muscle_areas
+from email_notifier import send_message_to
 
 # Global variables
-oai_exercises: list = []
 notion_url: str = "https://dapper-lobe-3ac.notion.site/Workouts-e46955bc195a484087a9c3e7e9f57418"
-notion_exercises: list = []
-sampled_exercises: list = []
-workout: Workout = None
 
 # Define the options for each user input
 muscle_areas = ["Full Upper Body", "Upper Body - Push", "Upper Body - Pull", "Full Core", "Core - Abs", "Core - Lower Back", "Legs"]
-#intensity_levels = list(range(1, 11))
 
 # Set up the Streamlit app
 st.set_page_config(layout="wide", page_title="Exercise Generator")
 st.title("Exercise Generator :man-lifting-weights:")
-st.markdown("### Select the muscle area, exercise type, and intensity level below, then click  Submit button to generate a list of exercises.")
+st.markdown("### Select the muscle area, exercise type, intensity level and number of exercises below, then choose an option to generate a fitting workout.")
 
 col1, col2 = st.columns([2,3])
 
@@ -27,8 +23,11 @@ col1, col2 = st.columns([2,3])
 with col1:
     muscle_area = st.selectbox("Muscle area", muscle_areas)
     exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Both"])
-    intensity = st.slider("Intensity level", 1, 10, 2)
+    intensity = st.slider("Intensity level", 0, 10, 2)
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
+    email = st.text_input("Enter your email address: - Optional")
+    st.write("This way you can retrieve your generated workout later!")
+
     _, subcol1, _, subcol2, _= st.columns(5)
     with subcol1:
         oai_button = st.button("OpenAI", key="oai_button")
@@ -43,12 +42,21 @@ with col2:
             st.markdown(f"Here are some {exercise_type.lower()} exercises provided by **OpenAI** targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
             for exercise in oai_exercises[1:]:
                 st.write(f"- {exercise}")
+            if email:
+                send_message_to(oai_exercises, email)
+                st.write("You should have received an E-Mail with the subject: 'Your generated workout'")
         else:
             st.write("OpenAI seems to be too busy, try the other option! :smile:")
     if notion_button:
         notion_exercises = get_exercises()
-        sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
-        workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
-        st.markdown(f"Here are some {exercise_type.lower()} exercises taken from my **Notion-notebook** ([see here]({notion_url})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
-        for exercise in workout.list_exercises():
-            st.write(f"- {exercise}")
+        if notion_exercises:
+            sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
+            workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
+            st.markdown(f"Here are some {exercise_type.lower()} exercises taken from my **Notion-notebook** ([see here]({notion_url})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
+            for exercise in workout.list_exercises():
+                st.write(f"- {exercise}")
+            if email:
+                send_message_to(workout.to_str(), email)
+                st.write("You should have received an E-Mail with the subject: 'Your generated workout'")
+        else:
+            st.write("The Notion-API does not to seem work :disappointed:")

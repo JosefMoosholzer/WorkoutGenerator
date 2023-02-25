@@ -1,4 +1,4 @@
-from typing import List, Dict, Callable
+from typing import List, Callable
 import requests
 import re as regex
 from random import sample
