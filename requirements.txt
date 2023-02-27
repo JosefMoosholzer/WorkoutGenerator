@@ -1,1 +1,2 @@
 openai==0.26.5
+streamlit-lottie==0.0.3
