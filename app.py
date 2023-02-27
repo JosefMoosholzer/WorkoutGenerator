@@ -43,7 +43,7 @@ with right_col:
     if oai_button:
         oai_exercises = oai.generate_exercises(muscle_area, exercise_type, intensity, num_exercises)
         if oai_exercises:
-            st.markdown(f"Here are some {exercise_type.lower()} exercises provided by **OpenAI** targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
+            st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises provided by **OpenAI** targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
             for exercise in oai_exercises[1:]:
                 st.write(f"- {exercise}")
             if email:
@@ -56,7 +56,7 @@ with right_col:
         if notion_exercises:
             sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
             workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
-            st.markdown(f"Here are some {exercise_type.lower()} exercises taken from my **Notion-notebook** ([see here]({NOTION_URL})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
+            st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises taken from my **Notion-notebook** ([see here]({NOTION_URL})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
             for exercise in workout.list_exercises():
                 st.write(f"- {exercise}")
             if email:
