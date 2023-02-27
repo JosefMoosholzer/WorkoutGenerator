@@ -105,7 +105,7 @@ def sample_exercises(exercises: List[Exercise], muscle_areas: List[MuscleArea], 
     if len(muscle_areas) == 2: # If there are two muscle areas given, then try to split them as even as possible between both.
         return sample_exercises(exercises, muscle_areas[0:1], exercise_types, amount - amount // 2) + sample_exercises(exercises, muscle_areas[1:], exercise_types, amount // 2)
     sub_pop = [exercise for exercise in exercises if (exercise.muscle_area in muscle_areas and type(exercise) in exercise_types)]
-    try: 
+    try:
         return sample(sub_pop, amount)
     except ValueError: # in case the sub-population is too small
         return sample_exercises(exercises, muscle_areas, exercise_types, amount - 1)

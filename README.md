@@ -1,0 +1,3 @@
+I created a [web application](https://josefmoosholzer-workoutgenerator-app-2ju42h.streamlit.app/) with Streamlit that generates workouts according to some user-inputs.
+
+The workout is either generated from the GPT-3 Davinci model through the OpenAI-API or from a Notion-workbook that is also retrieved through an API (Notion). The user has also the option to put in his email address to receive his workout via email, through another API (Google)!
