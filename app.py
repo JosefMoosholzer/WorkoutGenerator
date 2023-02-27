@@ -27,7 +27,7 @@ left_col, right_col = st.columns([2,3])
 with left_col:
     # Define the options for each user input
     muscle_area = st.selectbox("Muscle area", MUSCLE_AREAS)
-    exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Both"])
+    exercise_type = st.selectbox("Exercise type", ["Bodyweight", "Weighted Exercises", "Body- and weighted exercises"])
     intensity = st.slider("Intensity level", 0, 10, 2)
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
     email = st.text_input("(Optional) Enter your email address - to retrieve your workout later!")

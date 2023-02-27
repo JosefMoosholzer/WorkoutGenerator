@@ -29,6 +29,6 @@ def str_to_exercise_types(string: str) -> List[Exercise]:
         return [BodyExercise]
     elif string == "Weighted Exercises":
         return [WeightedExercise]
-    elif string == "Both":
+    elif string == "Body- and weighted exercises":
         return [BodyExercise, WeightedExercise]
     else: return []
