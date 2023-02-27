@@ -9,6 +9,5 @@ def load_lottie(muscle_area: str):
         with open("lotties/crunches.json", 'r') as f:
             st_lottie(json.load(f), height=300, key="coding")
     else:
-        with open("lotties/low_squat.json", 'r') as f:
+        with open("lotties/high_squat.json", 'r') as f:
             st_lottie(json.load(f), height=300, key="coding")
-            
