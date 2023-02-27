@@ -101,9 +101,11 @@ def get_exercises() -> List[Exercise]:
     return [str_to_exercise(exercise["bulleted_list_item"]["rich_text"][0]["plain_text"], MuscleArea(bullet[0])) for bullet in bullets for exercise in api_get(bullet[1])]
 
 
-def sample_exercises(exercises: List[Exercise], muscle_areas: MuscleArea, exercise_types, amount: int):
+def sample_exercises(exercises: List[Exercise], muscle_areas: List[MuscleArea], exercise_types, amount: int) -> List[Exercise]:
+    if len(muscle_areas) == 2: # If there are two muscle areas given, then try to split them as even as possible between both.
+        return sample_exercises(exercises, muscle_areas[0:1], exercise_types, amount - amount // 2) + sample_exercises(exercises, muscle_areas[1:], exercise_types, amount // 2)
     sub_pop = [exercise for exercise in exercises if (exercise.muscle_area in muscle_areas and type(exercise) in exercise_types)]
-    try: # in case the sub-population is too small
+    try: 
         return sample(sub_pop, amount)
-    except ValueError:
+    except ValueError: # in case the sub-population is too small
         return sample_exercises(exercises, muscle_areas, exercise_types, amount - 1)

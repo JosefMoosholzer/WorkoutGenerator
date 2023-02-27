@@ -56,7 +56,7 @@ with right_col:
         if notion_exercises:
             sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
             workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
-            st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises taken from my **Notion-notebook** ([see here]({NOTION_URL})) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
+            st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises taken from my [**Notion-notebook**]({NOTION_URL}) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
             for exercise in workout.list_exercises():
                 st.write(f"- {exercise}")
             if email:
