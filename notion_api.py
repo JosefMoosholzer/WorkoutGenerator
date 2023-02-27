@@ -90,7 +90,7 @@ def create_header():
 
 
 def api_get(id) -> dict:
-    print("API-Request")
+    #print("API-Request")
     return requests.get(f"https://api.notion.com/v1/blocks/{id}/children", headers=create_header()).json()["results"]
 
 
