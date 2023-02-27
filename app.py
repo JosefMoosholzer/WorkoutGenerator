@@ -11,13 +11,14 @@ from lottie import load_lottie
 NOTION_URL = "https://dapper-lobe-3ac.notion.site/Workouts-e46955bc195a484087a9c3e7e9f57418"
 MUSCLE_AREAS = ["Full Upper Body", "Upper Body - Push", "Upper Body - Pull", "Full Core", "Core - Abs", "Core - Lower Back", "Legs"]
 
-
 # Set up the Streamlit app
 st.set_page_config(page_title="Exercise Generator", page_icon=":muscle:", layout="wide")
+
+with open("style/style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 with st.container():
-    st.header("Hi, my name is Josef! :wave:")
     st.title("Exercise Generator :man-lifting-weights:")
-    st.markdown("### Select the muscle area, exercise type, intensity level and number of exercises below, then choose an option to generate a fitting workout.")
+    st.markdown("### Select the parameters of your wished workout, then choose an option to generate a fitting workout.")
     st.write("---")
 
 left_col, right_col = st.columns([2,3])
@@ -31,7 +32,7 @@ with left_col:
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
     email = st.text_input("(Optional) Enter your email address - to retrieve your workout later!")
 
-    _, subcol1, _, subcol2, _= st.columns(5)
+    subcol1, subcol2, _= st.columns(3)
     with subcol1:
         oai_button = st.button("OpenAI", key="oai_button")
     with subcol2:
