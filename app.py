@@ -21,7 +21,7 @@ with st.container():
     st.markdown("### Select the parameters of your wished workout, then choose an option to generate a fitting workout.")
     st.write("---")
 
-left_col, right_col = st.columns([2,3])
+left_col, right_col = st.columns([1,2])
 
 # Left column
 with left_col:
@@ -32,20 +32,23 @@ with left_col:
     num_exercises = st.slider("Number of exercises", 1, 6, 4)
     email = st.text_input("(Optional) Enter your email address - to retrieve your workout later!")
 
-    subcol1, subcol2, _= st.columns(3)
-    with subcol1:
+    left_subcol1, left_subcol2, _= st.columns(3)
+    with left_subcol1:
         oai_button = st.button("OpenAI", key="oai_button")
-    with subcol2:
+    with left_subcol2:
         notion_button = st.button("Notion", key="notion_button")
 
 # Add the generated output to the right column
 with right_col:
+    
     if oai_button:
         oai_exercises = oai.generate_exercises(muscle_area, exercise_type, intensity, num_exercises)
         if oai_exercises:
             st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises provided by **OpenAI** targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
-            for exercise in oai_exercises[1:]:
-                st.write(f"- {exercise}")
+            right_subcol1, right_subcol2 = st.columns(2)
+            with right_subcol1:
+                for exercise in oai_exercises[1:]:
+                    st.write(f"- {exercise}")
             if email:
                 send_message_to("\n".join(oai_exercises), email)
                 st.write("You should have received an E-Mail with the subject 'Your generated workout'!")
@@ -57,8 +60,10 @@ with right_col:
             sampled_exercises = sample_exercises(notion_exercises, str_to_muscle_areas(muscle_area), str_to_exercise_types(exercise_type), num_exercises)
             workout = Workout(sampled_exercises, intensity, str_to_muscle_areas(muscle_area))
             st.markdown(f"Here are some {regex.sub(' exercises', '',exercise_type.lower())} exercises taken from my [**Notion-notebook**]({NOTION_URL}) targeting the {regex.sub('-', '/', muscle_area).lower()} with an intensity level of {intensity}:")
-            for exercise in workout.list_exercises():
-                st.write(f"- {exercise}")
+            right_subcol1, right_subcol2 = st.columns(2)
+            with right_subcol1:
+                for exercise in workout.list_exercises():
+                    st.write(f"- {exercise}")
             if email:
                 send_message_to(workout.to_str(), email)
                 st.write("You should have received an E-Mail with the subject 'Your generated workout'!")
@@ -66,4 +71,5 @@ with right_col:
             st.write("The Notion-API does not to seem work :disappointed:")
 
     if oai_button or notion_button:
-        load_lottie(muscle_area)
+        with right_subcol2:
+            load_lottie(muscle_area, len(workout.list_exercises()))
